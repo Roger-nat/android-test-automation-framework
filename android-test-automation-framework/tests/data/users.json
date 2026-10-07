@@ -1,0 +1,14 @@
+{
+  "standard": {
+    "username": "bob@example.com",
+    "password": "10203040"
+  },
+  "locked": {
+    "username": "alice@example.com",
+    "password": "10203040"
+  },
+  "invalid": {
+    "username": "not-a-real-user@example.com",
+    "password": "wrong-password"
+  }
+}

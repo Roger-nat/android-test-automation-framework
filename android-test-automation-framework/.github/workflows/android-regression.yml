@@ -1,0 +1,72 @@
+name: Android Regression
+
+on:
+  workflow_dispatch:
+
+jobs:
+  android-regression:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Download Appium sample APK
+        run: python scripts/download_demo_app.py
+
+      - name: Install Appium
+        run: |
+          npm install -g appium
+          appium driver install uiautomator2
+
+      - name: Boot Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          emulator-options: -no-window -no-audio -no-boot-anim
+          disable-animations: true
+          script: |
+            nohup appium --log-level info > appium.log 2>&1 &
+            sleep 10
+            export RUN_MOBILE_TESTS=1
+            export DEVICE_NAME=emulator-5554
+            export PLATFORM_VERSION=11
+            python -m pytest -m regression
+            python -m pytest -m smoke
+        env:
+          APPIUM_SERVER_URL: http://127.0.0.1:4723
+          APP_PATH: ./app/Android.MyDemoAppRN.apk
+          APP_PACKAGE: com.swaglabsmobileapp
+          STANDARD_USER_EMAIL: bob@example.com
+          STANDARD_USER_PASSWORD: 10203040
+          LOCKED_USER_EMAIL: alice@example.com
+          LOCKED_USER_PASSWORD: 10203040
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-artifacts
+          path: |
+            reports/
+            artifacts/
+            appium.log

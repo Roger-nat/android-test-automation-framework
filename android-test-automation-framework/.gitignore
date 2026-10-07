@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Environment / secrets
+.env
+
+# Mobile app binaries
+app/*.apk
+app/*.aab
+app/*.ipa
+
+# Generated output
+reports/*
+artifacts/*
+!reports/.gitkeep
+!artifacts/.gitkeep
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
